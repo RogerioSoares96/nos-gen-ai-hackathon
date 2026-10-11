@@ -10,7 +10,7 @@ import sys
 from submission.anonymizer import config
 from submission.anonymizer.base_prompt import load_base
 from submission.anonymizer.extract import pdf_to_text
-from submission.anonymizer.llm import GeminiClient, LLMClient
+from submission.anonymizer.llm import LLMClient, make_client
 from submission.anonymizer.orchestrator import run_pipeline
 from submission.anonymizer.report import write_report, write_utf8
 from submission.validation import DocumentValidator
@@ -23,11 +23,14 @@ def main(argv: list[str] | None = None,
                         help="send prompt.txt alone, as the CI check does")
     parser.add_argument("--no-validate", action="store_true",
                         help="skip the meaning-preservation score")
+    parser.add_argument("--no-cache", action="store_true",
+                        help="ask Gemini again instead of reusing replies")
     args = parser.parse_args(argv)
 
     try:
         if client is None:
-            client = GeminiClient(model=config.main_model())
+            client = make_client(config.main_model(),
+                                 refresh=args.no_cache)
 
         if args.single_shot:
             _single_shot(client)

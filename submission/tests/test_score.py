@@ -4,7 +4,10 @@ import json
 import tempfile
 import unittest
 from pathlib import Path
+from unittest.mock import patch
 
+from submission.anonymizer import config
+from submission.evaluate import score
 from submission.evaluate.score import (
     evaluate,
     load_dataset,
@@ -12,6 +15,12 @@ from submission.evaluate.score import (
     score_masked,
 )
 from submission.tests.fakes import FakeLLMClient
+
+
+def no_findings(prompt, schema):
+    if "verificação de contexto" in prompt:
+        return json.dumps({"additions": [], "rejections": []})
+    return json.dumps({"findings": []})
 
 
 class TestScoreMasked(unittest.TestCase):
@@ -70,6 +79,22 @@ class TestDataset(unittest.TestCase):
             code = main(["--data", str(self.data)],
                         client=FakeLLMClient(None))
         self.assertEqual(code, 1)
+
+    def test_replies_are_cached_unless_no_cache(self):
+        self.write("synthetic_document_001.txt", "Nome: Ana")
+        self.write("synthetic_document_001_masked.txt", "Nome: *")
+
+        for extra, refresh in (([], False), (["--no-cache"], True)):
+            with self.subTest(extra=extra), \
+                    patch.object(config, "main_model", return_value="m"), \
+                    patch.object(score, "make_client") as make_client, \
+                    contextlib.redirect_stdout(io.StringIO()):
+                make_client.return_value = FakeLLMClient(no_findings)
+
+                code = main(["--data", str(self.data)] + extra)
+
+                self.assertEqual(code, 0)
+                make_client.assert_called_once_with("m", refresh=refresh)
 
 
 class TestEvaluate(unittest.TestCase):

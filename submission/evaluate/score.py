@@ -9,7 +9,7 @@ from pathlib import Path
 
 from submission.anonymizer import config
 from submission.anonymizer.base_prompt import load_base
-from submission.anonymizer.llm import GeminiClient, LLMClient
+from submission.anonymizer.llm import LLMClient, make_client
 from submission.anonymizer.orchestrator import run_pipeline
 
 DEFAULT_DATA_DIR = config.SUBMISSION_DIR / "synth" / "data"
@@ -82,6 +82,8 @@ def main(argv: list[str] | None = None,
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument("--data", type=Path, default=DEFAULT_DATA_DIR,
                         help="directory with *.txt / *_masked.txt pairs")
+    parser.add_argument("--no-cache", action="store_true",
+                        help="ask Gemini again instead of reusing replies")
     args = parser.parse_args(argv)
 
     dataset = load_dataset(args.data)
@@ -91,7 +93,8 @@ def main(argv: list[str] | None = None,
 
     try:
         if client is None:
-            client = GeminiClient(model=config.main_model())
+            client = make_client(config.main_model(),
+                                 refresh=args.no_cache)
         result = evaluate(dataset, load_base(), client)
     except Exception as error:
         print(f"error: {error}", file=sys.stderr)

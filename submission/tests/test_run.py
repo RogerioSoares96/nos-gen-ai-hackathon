@@ -73,6 +73,21 @@ class TestMain(unittest.TestCase):
                          "Nome: * *")
         self.assertEqual(self.submission.read_text(encoding="utf-8"), "OLD")
 
+    def test_replies_are_cached_unless_no_cache(self):
+        for args, refresh in ((["--single-shot"], False),
+                              (["--single-shot", "--no-cache"], True)):
+            with self.subTest(args=args), \
+                    patch.object(config, "main_model", return_value="m"), \
+                    patch.object(run, "make_client") as make_client:
+                make_client.return_value = FakeLLMClient(
+                    lambda prompt, schema: "Nome: * *"
+                )
+
+                code, _ = self.run_main(args, None)
+
+                self.assertEqual(code, 0)
+                make_client.assert_called_once_with("m", refresh=refresh)
+
 
 if __name__ == "__main__":
     unittest.main()
