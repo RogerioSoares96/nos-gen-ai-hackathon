@@ -1,0 +1,336 @@
+{
+  "findings": [
+    {
+      "text": "Maria Conceição Oliveira Santos",
+      "category": "identity",
+      "reason": "Nome do paciente.",
+      "context": "Nome: Maria Conceição Oliveira Santos"
+    },
+    {
+      "text": "12/03/1978",
+      "category": "identity",
+      "reason": "Data de nascimento de pessoa identificável.",
+      "context": "Data de Nascimento: 12/03/1978"
+    },
+    {
+      "text": "097865413",
+      "category": "gov_financial_ids",
+      "reason": "Número de Identificação Fiscal (NIF).",
+      "context": "NIF: 097865413"
+    },
+    {
+      "text": "12345678-9ZX0",
+      "category": "gov_financial_ids",
+      "reason": "Número de Cartão de Cidadão.",
+      "context": "Cartão de Cidadão: 12345678-9ZX0"
+    },
+    {
+      "text": "Rua das Flores, 123, Apt 45, Sacavém, Lisboa",
+      "category": "contact_location",
+      "reason": "Morada completa da paciente.",
+      "context": "Morada: Rua das Flores, 123, Apt 45, Sacavém, Lisboa"
+    },
+    {
+      "text": "+351 912 345 678",
+      "category": "contact_location",
+      "reason": "Número de telefone pessoal.",
+      "context": "Telefone: +351 912 345 678"
+    },
+    {
+      "text": "maria.santos@emailpessoal.pt",
+      "category": "contact_location",
+      "reason": "Endereço de email pessoal.",
+      "context": "Email: maria.santos@emailpessoal.pt"
+    },
+    {
+      "text": "11223344556",
+      "category": "gov_financial_ids",
+      "reason": "Número da Segurança Social.",
+      "context": "Número da Segurança Social: 11223344556"
+    },
+    {
+      "text": "Maria Santos",
+      "category": "identity",
+      "reason": "Nome da paciente.",
+      "context": "A paciente Maria Santos, mulher caucasiana de 47 anos, compareceu à consulta relatando dores"
+    },
+    {
+      "text": "caucasiana",
+      "category": "sensitive_social",
+      "reason": "Origem étnica da paciente.",
+      "context": "A paciente Maria Santos, mulher caucasiana de 47 anos, compareceu à consulta relatando dores"
+    },
+    {
+      "text": "47 anos",
+      "category": "identity",
+      "reason": "Idade de pessoa identificável.",
+      "context": "A paciente Maria Santos, mulher caucasiana de 47 anos, compareceu à consulta relatando dores"
+    },
+    {
+      "text": "hipertensão",
+      "category": "health",
+      "reason": "Diagnóstico médico da paciente.",
+      "context": "abdominais intensas. Tem histórico de hipertensão e diabetes tipo 2, diagnosticada há 5 anos. É"
+    },
+    {
+      "text": "diabetes tipo 2",
+      "category": "health",
+      "reason": "Diagnóstico médico da paciente.",
+      "context": "abdominais intensas. Tem histórico de hipertensão e diabetes tipo 2, diagnosticada há 5 anos. É"
+    },
+    {
+      "text": "HIV positivo",
+      "category": "health",
+      "reason": "Estado serológico da paciente.",
+      "context": "HIV positivo desde 2018, atualmente com carga viral indetectável graças ao tratamento com"
+    },
+    {
+      "text": "carga viral indetectável",
+      "category": "health",
+      "reason": "Informação sobre estado de saúde e carga viral.",
+      "context": "HIV positivo desde 2018, atualmente com carga viral indetectável graças ao tratamento com"
+    },
+    {
+      "text": "antirretrovirais",
+      "category": "health",
+      "reason": "Medicação da paciente.",
+      "context": "antirretrovirais."
+    },
+    {
+      "text": "cancro da mama (mãe falecida aos 52 anos)",
+      "category": "health",
+      "reason": "Histórico médico familiar da paciente.",
+      "context": "A paciente relatou que sua família tem histórico de cancro da mama (mãe falecida aos 52 anos)"
+    },
+    {
+      "text": "doença cardíaca (pai e avô paterno)",
+      "category": "health",
+      "reason": "Histórico médico familiar da paciente.",
+      "context": "e doença cardíaca (pai e avô paterno). Exames genéticos realizados em 2022 indicaram"
+    },
+    {
+      "text": "predisposição ao cancro de mama (mutação BRCA1 positiva)",
+      "category": "health",
+      "reason": "Informação genética da paciente.",
+      "context": "predisposição ao cancro de mama (mutação BRCA1 positiva)."
+    },
+    {
+      "text": "Divorciada",
+      "category": "sensitive_social",
+      "reason": "Estado civil da paciente.",
+      "context": "Estado civil: Divorciada"
+    },
+    {
+      "text": "João",
+      "category": "identity",
+      "reason": "Nome do filho da paciente.",
+      "context": "Filhos: 2 (João, 15 anos e Ana, 12 anos)"
+    },
+    {
+      "text": "15 anos",
+      "category": "identity",
+      "reason": "Idade de familiar identificável.",
+      "context": "Filhos: 2 (João, 15 anos e Ana, 12 anos)"
+    },
+    {
+      "text": "Ana",
+      "category": "identity",
+      "reason": "Nome da filha da paciente.",
+      "context": "Filhos: 2 (João, 15 anos e Ana, 12 anos)"
+    },
+    {
+      "text": "12 anos",
+      "category": "identity",
+      "reason": "Idade de familiar identificável.",
+      "context": "Filhos: 2 (João, 15 anos e Ana, 12 anos)"
+    },
+    {
+      "text": "Católica praticante",
+      "category": "sensitive_social",
+      "reason": "Religião da paciente.",
+      "context": "Religião: Católica praticante"
+    },
+    {
+      "text": "Professora universitária",
+      "category": "contact_location",
+      "reason": "Profissão da paciente.",
+      "context": "Ocupação: Professora universitária na Faculdade de Direito de Lisboa"
+    },
+    {
+      "text": "Faculdade de Direito de Lisboa",
+      "category": "contact_location",
+      "reason": "Local de trabalho da paciente.",
+      "context": "Ocupação: Professora universitária na Faculdade de Direito de Lisboa"
+    },
+    {
+      "text": "Ex-fumante (parou há 3 anos)",
+      "category": "sensitive_social",
+      "reason": "Consumo de substâncias.",
+      "context": "Hábitos: Ex-fumante (parou há 3 anos), consome álcool socialmente (2-3 doses por semana)"
+    },
+    {
+      "text": "consome álcool socialmente (2-3 doses por semana)",
+      "category": "sensitive_social",
+      "reason": "Consumo de substâncias.",
+      "context": "Hábitos: Ex-fumante (parou há 3 anos), consome álcool socialmente (2-3 doses por semana)"
+    },
+    {
+      "text": "Tratamento para dependência de ansiolíticos em 2019",
+      "category": "sensitive_social",
+      "reason": "Histórico de dependência de substâncias.",
+      "context": "Histórico de uso de substâncias: Tratamento para dependência de ansiolíticos em 2019"
+    },
+    {
+      "text": "987654321",
+      "category": "gov_financial_ids",
+      "reason": "Número de apólice de seguro.",
+      "context": "Seguro de saúde: Plano Premium Saúde Total, apólice nº 987654321"
+    },
+    {
+      "text": "4111 2222 3333 4444",
+      "category": "gov_financial_ids",
+      "reason": "Número de cartão de crédito.",
+      "context": "Número do cartão de crédito: 4111 2222 3333 4444 (validade 09/27, CVV 123)"
+    },
+    {
+      "text": "09/27",
+      "category": "gov_financial_ids",
+      "reason": "Validade de cartão de crédito.",
+      "context": "Número do cartão de crédito: 4111 2222 3333 4444 (validade 09/27, CVV 123)"
+    },
+    {
+      "text": "123",
+      "category": "gov_financial_ids",
+      "reason": "Código CVV de cartão de crédito.",
+      "context": "Número do cartão de crédito: 4111 2222 3333 4444 (validade 09/27, CVV 123)"
+    },
+    {
+      "text": "€62.500",
+      "category": "gov_financial_ids",
+      "reason": "Rendimento da paciente.",
+      "context": "Rendimento anual declarado: €62.500"
+    },
+    {
+      "text": "ID-BIO-12345",
+      "category": "health",
+      "reason": "Identificador biométrico de impressão digital.",
+      "context": "Impressão digital registrada no sistema: ID-BIO-12345"
+    },
+    {
+      "text": "FACE-ID-78901",
+      "category": "health",
+      "reason": "Identificador biométrico de reconhecimento facial.",
+      "context": "Reconhecimento facial: FACE-ID-78901"
+    },
+    {
+      "text": "1,68m",
+      "category": "health",
+      "reason": "Dado biométrico de altura.",
+      "context": "Altura: 1,68m"
+    },
+    {
+      "text": "72kg",
+      "category": "health",
+      "reason": "Dado biométrico de peso.",
+      "context": "Peso: 72kg"
+    },
+    {
+      "text": "O+",
+      "category": "health",
+      "reason": "Tipo sanguíneo da paciente.",
+      "context": "Tipo sanguíneo: O+"
+    },
+    {
+      "text": "145/90 mmHg",
+      "category": "health",
+      "reason": "Dado biométrico de pressão arterial.",
+      "context": "Pressão arterial na admissão: 145/90 mmHg"
+    },
+    {
+      "text": "Metformina 850mg",
+      "category": "health",
+      "reason": "Medicação prescrita.",
+      "context": "Prescrição: Metformina 850mg 2x/dia, Losartana 50mg 1x/dia, Alprazolam 0,5mg (apenas em"
+    },
+    {
+      "text": "Losartana 50mg",
+      "category": "health",
+      "reason": "Medicação prescrita.",
+      "context": "Prescrição: Metformina 850mg 2x/dia, Losartana 50mg 1x/dia, Alprazolam 0,5mg (apenas em"
+    },
+    {
+      "text": "Alprazolam 0,5mg",
+      "category": "health",
+      "reason": "Medicação prescrita.",
+      "context": "Prescrição: Metformina 850mg 2x/dia, Losartana 50mg 1x/dia, Alprazolam 0,5mg (apenas em"
+    },
+    {
+      "text": "António Santos",
+      "category": "identity",
+      "reason": "Nome do contato de emergência (irmão).",
+      "context": "Nome: António Santos (irmão)"
+    },
+    {
+      "text": "+351961234567",
+      "category": "contact_location",
+      "reason": "Número de telefone do contato de emergência.",
+      "context": "Telefone: +351961234567"
+    },
+    {
+      "text": "antonio.santos@emailpessoal.pt",
+      "category": "contact_location",
+      "reason": "Endereço de email do contato de emergência.",
+      "context": "Email: antonio.santos@emailpessoal.pt"
+    },
+    {
+      "text": "Joana Pereira",
+      "category": "identity",
+      "reason": "Nome do contato de emergência (amiga).",
+      "context": "Nome: Joana Pereira (amiga próxima)"
+    },
+    {
+      "text": "+351939876543",
+      "category": "contact_location",
+      "reason": "Número de telefone do contato de emergência.",
+      "context": "Telefone: +351939876543"
+    },
+    {
+      "text": "Carlos Mendes",
+      "category": "identity",
+      "reason": "Nome do médico assistente.",
+      "context": "Dr. Carlos Mendes"
+    },
+    {
+      "text": "12345-PT",
+      "category": "gov_financial_ids",
+      "reason": "Número de cédula profissional do médico.",
+      "context": "CRM: 12345-PT"
+    },
+    {
+      "text": "carlos.mendes@centromedicalisboa.pt",
+      "category": "contact_location",
+      "reason": "Endereço de email profissional do médico.",
+      "context": "Email: carlos.mendes@centromedicalisboa.pt"
+    },
+    {
+      "text": "+351213456789",
+      "category": "contact_location",
+      "reason": "Número de telefone profissional do médico.",
+      "context": "Telefone: +351213456789"
+    },
+    {
+      "text": "Plano Premium Saúde Total",
+      "category": "gov_financial_ids",
+      "reason": "Identifica a apólice e seguro de saúde da paciente.",
+      "context": "Seguro de saúde: Plano Premium Saúde Total, apólice nº *"
+    },
+    {
+      "text": "crises de ansiedade",
+      "category": "health",
+      "reason": "Indica uma condição clínica e diagnóstico associado à posologia da prescrição médica.",
+      "context": "Prescrição: * * 2x/dia, * * 1x/dia, * * (apenas em\ncaso de crises de ansiedade)."
+    }
+  ],
+  "rejected": [],
+  "unmatched": []
+}
