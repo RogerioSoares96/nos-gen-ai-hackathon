@@ -1,0 +1,86 @@
+[
+  {
+    "id": "identity",
+    "name": "Identidade",
+    "description": "Nomes de pessoas (paciente, familiares, amigos, médicos) e a idade de uma pessoa identificável.",
+    "examples": [
+      "Pedro Almeida",
+      "Dra. Inês Ribeiro",
+      "filha Beatriz",
+      "homem de 63 anos"
+    ],
+    "do_not_mask": [
+      "Títulos e papéis sem nome (paciente, médico, irmão, amiga próxima)",
+      "Nomes de secções do documento"
+    ]
+  },
+  {
+    "id": "contact_location",
+    "name": "Contacto e localização",
+    "description": "Moradas, localidades de residência, telefones, emails, a profissão e o local de trabalho de uma pessoa.",
+    "examples": [
+      "Avenida da Liberdade, 45, 2.º Esq.",
+      "Odivelas",
+      "+351 934 567 890",
+      "pedro.almeida@correio.pt",
+      "Escola Secundária de Setúbal",
+      "Engenheiro civil"
+    ],
+    "do_not_mask": [
+      "O nome da instituição no título do relatório",
+      "Indicativos genéricos sem número associado"
+    ]
+  },
+  {
+    "id": "gov_financial_ids",
+    "name": "Identificadores oficiais e financeiros",
+    "description": "NIF, Cartão de Cidadão, número da Segurança Social, números de cartão de crédito, validade, CVV, números de apólice, rendimentos e números de cédula profissional.",
+    "examples": [
+      "NIF: 234567890",
+      "Cartão de Cidadão: 98765432-1AB2",
+      "5500 1111 2222 3333",
+      "CVV 456",
+      "apólice nº 123123123",
+      "€48.000"
+    ],
+    "do_not_mask": [
+      "A data do relatório",
+      "O código de referência do relatório (ex.: ADM-AAAA-MM-DD-NNN)"
+    ]
+  },
+  {
+    "id": "health",
+    "name": "Saúde",
+    "description": "Diagnósticos, estado serológico, informação genética, histórico médico familiar, medicação, dados biométricos e identificadores biométricos.",
+    "examples": [
+      "asma crónica",
+      "hepatite C",
+      "mutação BRCA2",
+      "pai com AVC aos 60 anos",
+      "Sertralina 50mg",
+      "BIO-ID-55555",
+      "Tipo sanguíneo: A-"
+    ],
+    "do_not_mask": [
+      "Nomes de secções (ex.: Histórico Médico)",
+      "Termos clínicos genéricos sem ligação a uma pessoa"
+    ]
+  },
+  {
+    "id": "sensitive_social",
+    "name": "Dados sociais sensíveis",
+    "description": "Religião, origem étnica, nacionalidade, filiação política, orientação sexual, estado civil, consumo de substâncias e dependências.",
+    "examples": [
+      "Muçulmano",
+      "mulher afrodescendente",
+      "nacionalidade brasileira",
+      "militante do Partido X",
+      "Viúvo",
+      "consumo de cannabis",
+      "dependência de opioides"
+    ],
+    "do_not_mask": [
+      "Nomes de campos (ex.: Estado civil, Religião)"
+    ]
+  }
+]

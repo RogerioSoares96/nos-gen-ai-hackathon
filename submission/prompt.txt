@@ -1,0 +1,107 @@
+És um especialista em proteção de dados pessoais (RGPD) e anonimização de
+documentos clínicos em português. Vais anonimizar o documento que aparece
+depois da linha "### DOCUMENTO ###".
+
+Regras de saída:
+1. Substitui cada palavra sensível por um único asterisco "*". Uma palavra
+   é tudo o que está entre espaços: "Ana Correia" passa a "* *",
+   "+351 912 345 678" passa a "* * * *" e um email inteiro passa a "*".
+2. Mantém a pontuação colada no início ou no fim da palavra:
+   "Lisboa," passa a "*," e "(Ana," passa a "(*,".
+3. Não alteres mais nada: mantém o texto não sensível, as quebras de linha,
+   os acentos e a pontuação exatamente como estão. Remove apenas as linhas
+   vazias.
+4. Devolve só o documento anonimizado, sem explicações, títulos ou blocos
+   de código.
+
+Categorias de dados sensíveis (o contexto decide o que é sensível):
+- identity: nomes de pessoas (paciente, familiares, amigos, médicos) e a
+  idade de uma pessoa identificável.
+- contact_location: moradas, localidades de residência, telefones, emails,
+  a profissão e o local de trabalho de uma pessoa.
+- gov_financial_ids: NIF, Cartão de Cidadão, número da Segurança Social,
+  cartões de crédito (número, validade, CVV), apólices, rendimentos e
+  cédulas profissionais.
+- health: diagnósticos, estado serológico, informação genética, histórico
+  médico familiar, medicação, dados e identificadores biométricos.
+- sensitive_social: religião, origem étnica, nacionalidade, filiação
+  política, orientação sexual, estado civil, consumo de substâncias e
+  dependências.
+
+Não anonimizes:
+- a data e o código de referência do relatório;
+- o nome da instituição no título do relatório;
+- nomes de campos e de secções (ex.: "Nome:", "Histórico Médico:");
+- termos genéricos sem ligação a uma pessoa (ex.: "paciente", "irmão").
+
+Exemplo:
+Entrada:
+Nome: Pedro Almeida
+Morada: Rua do Sol, 12, Odivelas
+Religião: Muçulmano
+Saída:
+Nome: * *
+Morada: * * *, *, *
+Religião: *
+
+### DOCUMENTO ###
+Relatório de Admissão - Centro Médico Lisboa
+Data: 15 de abril de 2025
+Referência: ADM-2025-04-15-089
+Informações do Paciente:
+Nome: Maria Conceição Oliveira Santos
+Data de Nascimento: 12/03/1978
+Sexo: Feminino
+NIF: 097865413
+Cartão de Cidadão: 12345678-9ZX0
+Morada: Rua das Flores, 123, Apt 45, Sacavém, Lisboa
+Telefone: +351 912 345 678
+Email: maria.santos@emailpessoal.pt
+Número da Segurança Social: 11223344556
+Histórico Médico:
+A paciente Maria Santos, mulher caucasiana de 47 anos, compareceu à consulta relatando dores
+abdominais intensas. Tem histórico de hipertensão e diabetes tipo 2, diagnosticada há 5 anos. É
+HIV positivo desde 2018, atualmente com carga viral indetectável graças ao tratamento com
+antirretrovirais.
+A paciente relatou que sua família tem histórico de cancro da mama (mãe falecida aos 52 anos)
+e doença cardíaca (pai e avô paterno). Exames genéticos realizados em 2022 indicaram
+predisposição ao cancro de mama (mutação BRCA1 positiva).
+Informações Sociais e Comportamentais:
+Estado civil: Divorciada
+Filhos: 2 (João, 15 anos e Ana, 12 anos)
+Religião: Católica praticante
+Ocupação: Professora universitária na Faculdade de Direito de Lisboa
+Hábitos: Ex-fumante (parou há 3 anos), consome álcool socialmente (2-3 doses por semana)
+Histórico de uso de substâncias: Tratamento para dependência de ansiolíticos em 2019
+Informações Financeiras:
+Seguro de saúde: Plano Premium Saúde Total, apólice nº 987654321
+Número do cartão de crédito: 4111 2222 3333 4444 (validade 09/27, CVV 123)
+Rendimento anual declarado: €62.500
+Dados Biométricos:
+Impressão digital registrada no sistema: ID-BIO-12345
+Reconhecimento facial: FACE-ID-78901
+Altura: 1,68m
+Peso: 72kg
+Tipo sanguíneo: O+
+Pressão arterial na admissão: 145/90 mmHg
+Notas da Consulta:
+A paciente apresentou-se ansiosa durante a consulta, relatando problemas no trabalho
+relativamente à elevada carga de responsabilidades que adquiriu. Sensação de cansaço, fadiga,
+e constante stress foram ditos fazer parte do seu dia-a-dia, no entanto, apresenta dificuldade em
+dormir/cumprir as horas indicadas de sono.
+Exames solicitados: hemograma completo, glicemia em jejum, perfil lipídico, função hepática e
+renal, ultrassonografia abdominal.
+Prescrição: Metformina 850mg 2x/dia, Losartana 50mg 1x/dia, Alprazolam 0,5mg (apenas em
+caso de crises de ansiedade).
+Contatos de Emergência:
+Nome: António Santos (irmão)
+Telefone: +351961234567
+Email: antonio.santos@emailpessoal.pt
+Nome: Joana Pereira (amiga próxima)
+Telefone: +351939876543
+Assinatura Digital:
+Dr. Carlos Mendes
+CRM: 12345-PT
+Especialidade: Medicina Interna
+Email: carlos.mendes@centromedicalisboa.pt
+Telefone: +351213456789
