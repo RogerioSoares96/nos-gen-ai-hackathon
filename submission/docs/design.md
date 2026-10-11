@@ -156,10 +156,19 @@ class LLMClient(Protocol):
     def generate_text(self, prompt: str) -> str: ...
 ```
 
-`GeminiClient(model, temperature=0.0)` implements it with `google-genai`,
-retrying HTTP 429/500/503 and dropped connections with backoff (1 s, 2 s,
-4 s; a per-minute 429 waits the `retryDelay` Google sends, capped at 60 s)
-and failing fast on a per-day 429. Tests use
+`GeminiClient(model, temperature=0.0)` implements it with `google-genai`.
+It spaces requests to each model at least 13 s apart (5 requests per
+minute plus a 1 s margin, since Google counts over a sliding minute), shared
+by every client of that model. It retries HTTP 429/500/503 and dropped
+connections: a per-minute 429 waits the exact delay from the error message
+(`retry in 20.657s`; `RetryInfo` rounds it down, so it is only the fallback)
+plus 1 s, capped at 60 s, for up to 3 retries; server errors back off 5,
+15, 45, 60, then 60 s, since "high demand" spikes last minutes. A per-day
+429 fails fast. The commands wrap it in `CachedClient` (`make_client`),
+which stores each successful reply in `outputs/.cache/` (gitignored), keyed
+by model and prompt: a rerun after a failure only sends the calls that never
+succeeded, and a changed prompt is always sent. `--no-cache` asks again and
+replaces the stored replies. Tests use
 `FakeLLMClient` (in `tests/`). It answers through a
 `responder(prompt, schema)` function, routing on prompt content rather than
 call order, and records the prompts it receives.
@@ -318,7 +327,8 @@ branch and open a PR to upstream `main`.
 - **PDF line wrapping.** `page.get_text()` keeps the PDF's visual line breaks
   (e.g. `dores` / `abdominais` on separate lines). We keep them, on the
   assumption that the target was made from the same extraction.
-- **Free-tier rate limits.** Retries with backoff in `llm.py`, and the call
-  budget in §4.
+- **Free-tier rate limits.** Request spacing and retries in `llm.py`, and
+  the call budget in §4. The spacing only sees this process: another
+  terminal or teammate on the same project still shares the quota.
 - **Overfitting in prompt optimisation.** Mitigated by the held-out split in
   §11.
