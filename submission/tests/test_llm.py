@@ -4,9 +4,11 @@ from unittest.mock import Mock, patch
 
 import httpx
 
-from submission.anonymizer import config
+from submission.anonymizer import config, llm
 from submission.anonymizer.llm import GeminiClient
 from submission.anonymizer.schemas import EntailmentScore
+
+SPACING = config.MIN_REQUEST_INTERVAL
 
 
 class Err(Exception):
@@ -29,10 +31,40 @@ class TestGeminiClient(unittest.TestCase):
         self.client_cls = client_cls.start()
         self.addCleanup(client_cls.stop)
         self.generate = self.client_cls.return_value.models.generate_content
-        self.sleep = Mock()
 
-    def make(self):
-        return GeminiClient("gemini-x", sleep=self.sleep)
+        # The request history is shared module state; each test starts
+        # with none, so no test waits on another's requests.
+        history = patch.dict(llm._last_request, clear=True)
+        history.start()
+        self.addCleanup(history.stop)
+
+        # A fake clock that only moves when the client sleeps, so tests
+        # never really wait and every sleep is recorded.
+        self.now = 0.0
+        self.sleep = Mock(side_effect=self._advance)
+        self.attempt_times = []
+
+    def _advance(self, seconds):
+        self.now += seconds
+
+    def _clock(self):
+        return self.now
+
+    def make(self, model="gemini-x"):
+        return GeminiClient(model, sleep=self.sleep, clock=self._clock)
+
+    def record_attempts(self, outcomes):
+        """Make generate_content yield outcomes, logging each call time."""
+        remaining = list(outcomes)
+
+        def attempt(**kwargs):
+            self.attempt_times.append(self.now)
+            outcome = remaining.pop(0)
+            if isinstance(outcome, Exception):
+                raise outcome
+            return outcome
+
+        self.generate.side_effect = attempt
 
     def test_generate_json_sends_schema_and_parses(self):
         self.generate.return_value = ok_response()
@@ -59,6 +91,42 @@ class TestGeminiClient(unittest.TestCase):
         config_arg = self.generate.call_args.kwargs["config"]
         self.assertIsNone(config_arg.response_mime_type)
 
+    def test_spaces_consecutive_requests(self):
+        self.record_attempts([ok_response(), ok_response()])
+        client = self.make()
+
+        client.generate_text("p")
+        client.generate_text("p")
+
+        self.assertEqual(self.attempt_times, [0, SPACING])
+
+    def test_no_wait_once_spacing_has_passed(self):
+        self.generate.return_value = ok_response()
+        client = self.make()
+
+        client.generate_text("p")
+        self.now += SPACING + 30
+        client.generate_text("p")
+
+        self.sleep.assert_not_called()
+
+    def test_clients_of_one_model_share_spacing(self):
+        self.record_attempts([ok_response(), ok_response()])
+
+        self.make().generate_text("p")
+        self.make().generate_text("p")
+
+        self.assertEqual(self.attempt_times, [0, SPACING])
+
+    def test_models_are_spaced_independently(self):
+        self.record_attempts([ok_response(), ok_response()])
+
+        self.make("model-a").generate_text("p")
+        self.make("model-b").generate_text("p")
+
+        self.assertEqual(self.attempt_times, [0, 0])
+        self.sleep.assert_not_called()
+
     def test_retries_on_429_then_succeeds(self):
         self.generate.side_effect = [Err(429), Err(503), ok_response()]
 
@@ -66,9 +134,43 @@ class TestGeminiClient(unittest.TestCase):
 
         self.assertEqual(result.score, 87)
         self.assertEqual(self.generate.call_count, 3)
+
+    def test_server_errors_back_off_in_growing_steps(self):
+        self.record_attempts([Err(503), Err(503), Err(503), ok_response()])
+
+        self.make().generate_json("p", EntailmentScore)
+
+        # The first 5 s backoff is topped up to the request spacing.
         self.assertEqual(
-            [c.args[0] for c in self.sleep.call_args_list], [1, 2]
+            [c.args[0] for c in self.sleep.call_args_list],
+            [5, SPACING - 5, 15, 45],
         )
+        self.assertEqual(
+            self.attempt_times, [0, SPACING, SPACING + 15, SPACING + 60]
+        )
+
+    def test_server_error_backoff_is_capped(self):
+        self.record_attempts([Err(503)] * 5 + [ok_response()])
+
+        self.make().generate_json("p", EntailmentScore)
+
+        self.assertEqual(
+            [c.args[0] for c in self.sleep.call_args_list],
+            [5, SPACING - 5, 15, 45,
+             config.MAX_RETRY_DELAY, config.MAX_RETRY_DELAY],
+        )
+
+    def test_server_errors_get_more_retries_than_rate_limits(self):
+        self.generate.side_effect = Err(503)
+
+        with self.assertRaises(RuntimeError) as ctx:
+            self.make().generate_json("p", EntailmentScore)
+
+        self.assertIn("503", str(ctx.exception))
+        self.assertEqual(
+            self.generate.call_count, config.MAX_SERVER_RETRIES + 1
+        )
+        self.assertGreater(config.MAX_SERVER_RETRIES, config.MAX_RETRIES)
 
     def test_gives_up_after_max_retries(self):
         self.generate.side_effect = Err(429)
@@ -86,7 +188,7 @@ class TestGeminiClient(unittest.TestCase):
         result = self.make().generate_json("p", EntailmentScore)
 
         self.assertEqual(result.score, 87)
-        self.sleep.assert_called_once_with(1)
+        self.assertEqual(self.generate.call_count, 2)
 
     def test_retries_http_transport_error(self):
         self.generate.side_effect = [
@@ -97,14 +199,30 @@ class TestGeminiClient(unittest.TestCase):
 
         self.assertEqual(result.score, 87)
 
-    def test_429_waits_server_retry_delay(self):
+    def test_429_waits_exact_delay_from_message_plus_margin(self):
+        # RetryInfo rounds the delay down ('20s'); the message keeps the
+        # fraction, and waiting the rounded value retries too early.
+        self.generate.side_effect = [
+            Err(429, "Please retry in 20.657348117s. "
+                     "{'retryDelay': '20s'}"),
+            ok_response(),
+        ]
+
+        self.make().generate_json("p", EntailmentScore)
+
+        self.sleep.assert_called_once()
+        self.assertAlmostEqual(
+            self.sleep.call_args.args[0], 20.657348117 + config.RETRY_MARGIN
+        )
+
+    def test_429_falls_back_to_retry_info(self):
         self.generate.side_effect = [
             Err(429, "PerMinute ... {'retryDelay': '32s'}"), ok_response()
         ]
 
         self.make().generate_json("p", EntailmentScore)
 
-        self.sleep.assert_called_once_with(32.0)
+        self.sleep.assert_called_once_with(32.0 + config.RETRY_MARGIN)
 
     def test_server_retry_delay_is_capped(self):
         self.generate.side_effect = [
