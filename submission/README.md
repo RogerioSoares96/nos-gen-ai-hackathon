@@ -41,8 +41,8 @@ Scored artefacts (do not rename, move, or delete):
    (Detector, Context Checker, and Reviewer) reasons about the text. It
    does not only look for formats like emails; it understands context to
    drop false alarms and catch hidden identifiers. At most **3 Gemini
-   calls** per document, made one after another (free-tier keys allow as
-   few as 5 requests per minute).
+   calls** per document, made one after another and spaced 13 s apart
+   (free-tier keys allow as few as 5 requests per minute).
 2. **Mask:** Deterministic masking replaces each sensitive word with one
    `*` (e.g. `Ana Correia` becomes `* *`, and `Flores,` becomes `*,`).
    Leading/trailing `,.;:()!?` are kept; inner `@ . - / +` belong to the
@@ -51,9 +51,9 @@ Scored artefacts (do not rename, move, or delete):
    visible).
 3. **Preserve:** Using PyMuPDF, the original PDF layout, line breaks, and
    accents are mapped to plain text. Empty lines and trailing spaces are
-   removed as requested. Dates and the header reference code
-   (`ADM-2025-04-15-089`) are *not* masked; context decides what counts
-   as sensitive.
+   removed as requested. The header date and reference code
+   (`ADM-2025-04-15-089`) are *not* masked, while the birth date is;
+   context decides what counts as sensitive.
 4. **Validate:** Each run writes `submission/outputs/report.md` (readable
    table of findings, rejections, unmatched spans, and an optional
    0–100 meaning-preservation score) plus `findings.json`. Synthetic
@@ -105,7 +105,7 @@ nos-gen-ai-hackathon/          # run every command from here
     data_generator.py          # synthetic labelled documents
     anonymizer/
       config.py                # paths, API_KEY, per-role models
-      llm.py                   # GeminiClient (retries 429/5xx)
+      llm.py                   # GeminiClient + reply cache
       schemas.py               # Finding and agent result models
       categories.json          # taxonomy (single source of truth)
       categories.py
@@ -120,7 +120,7 @@ nos-gen-ai-hackathon/          # run every command from here
     evaluate/score.py          # precision / recall / F1
     optimize/search.py         # offline prompt search (stub)
     tests/                     # unittest + FakeLLMClient (no network)
-    outputs/                   # report.md, findings.json
+    outputs/                   # report.md, findings.json, .cache/
     docs/                      # design.md, implementation-plan.md
 ```
 
@@ -173,8 +173,9 @@ VALIDATION_MODEL=gemini-3.8-flash
 The data generator also accepts `GEMINI_API_KEY` as an alias for
 `API_KEY`. Free-tier limits are tight and differ per model (seen: 20
 requests/day for `gemini-3.8-flash`, 5 requests/minute for
-`gemini-3.6-flash`). Retired models may still appear in `models.list()`
-but return 404 for new keys.
+`gemini-3.6-flash`); quotas count per Google Cloud project and model, so
+a second key in the same project adds nothing. Retired models may still
+appear in `models.list()` but return 404 for new keys.
 
 ## 🚀 Usage
 
@@ -189,7 +190,14 @@ writes the masked text to `submission/submission.txt` plus
 python -m submission.run
 python -m submission.run --single-shot   # prompt.txt alone, like CI
 python -m submission.run --no-validate   # skip the entailment score
+python -m submission.run --no-cache      # ask Gemini again (see below)
 ```
+
+Every successful Gemini reply is stored in `submission/outputs/.cache/`
+(gitignored), keyed by model and prompt. A run that fails halfway (e.g.
+a 503 "high demand") costs only the missing calls when rerun, and a
+changed prompt is always sent fresh. `--no-cache` ignores the stored
+replies and replaces them; it works for `evaluate.score` too.
 
 **2. Evaluate against Synthetic Data:**
 First generate labelled pairs (`*.txt` + `*_masked.txt`) into
@@ -203,8 +211,8 @@ python -m submission.evaluate.score --data path/to/pairs
 ```
 
 **3. Run Test Suite:**
-Runs the unittest suite (81 tests) with `FakeLLMClient`. Tests never
-hit the network or load a real `.env`.
+Runs the unittest suite with `FakeLLMClient` and a fake clock. Tests
+never hit the network, sleep, or load a real `.env`.
 ```bash
 python -m unittest discover -s submission -t .
 ```
@@ -235,8 +243,10 @@ the pipeline report.
 ## 📚 Open-Source Libraries Used
 
 * **google-genai:** Gemini client (`GeminiClient` in `anonymizer/llm.py`).
-  Retries 429/500/503 and dropped connections; fails fast on a per-day
-  quota 429.
+  Spaces requests to each model 13 s apart; a per-minute 429 waits the
+  exact delay Google states, server errors (500/503, dropped
+  connections) back off 5 → 60 s over 5 retries, and a per-day 429
+  fails fast.
 * **PyMuPDF (fitz):** High-fidelity text extraction so PDF layout maps
   to plain text.
 * **pydantic:** Structured JSON output from agents (`Finding` and related
@@ -247,4 +257,5 @@ the pipeline report.
 * **flake8:** PEP 8 / 79-character line length, matching CI `lint.yml`.
 
 ---
-*Built for JunctionX Lisbon 2026 by João Henriques, Rogério Soares, and Salvador Antunes.*
+*Built for JunctionX Lisbon 2026 by João Henriques, Rogério Soares, and
+Salvador Antunes.*
